@@ -15,8 +15,6 @@ import {
 } from "three";
 import States from "stats.js";
 import { onMounted, ref } from "vue";
-import * as dat from "dat.gui";
-const gui = new dat.GUI();
 
 const threeRef = ref();
 const statesRef = ref();
@@ -105,55 +103,15 @@ function initScene() {
   // 添加并挂载
   threeRef.value.appendChild(renderer.domElement);
   let step = 0;
-  const controls = {
-    rotationSpeed: 0.02,
-    bouncingSpeed: 0.03,
-    addCube() {
-      const cubeGeometry = new BoxGeometry(4, 4, 4);
-      // 材质
-      const cubeMaterial = new MeshLambertMaterial({ color: 0xff0000 });
-
-      const cube = new Mesh(cubeGeometry, cubeMaterial);
-      cube.name = "cube-" + (scene.children.length + 1);
-      cube.castShadow = true;
-      cube.position.x = -30 + Math.round(Math.random() * planeGeometry.parameters.width);
-      cube.position.y = Math.round(Math.random() * 5);
-      cube.position.z = -20 + Math.round(Math.random() * planeGeometry.parameters.height);
-      scene.add(cube);
-      console.log(scene.children);
-      this.numberOfObjects = scene.children.length;
-    },
-    removeCube() {
-      if (this.numberOfObjects === 5) return;
-
-      scene.remove(scene.children[scene.children.length - 1]);
-      this.numberOfObjects = scene.children.length;
-    },
-    numberOfObjects: scene.children.length,
-  };
-  gui.add(controls, "rotationSpeed");
-  gui.add(controls, "bouncingSpeed");
-  gui.add(controls, "addCube");
-  gui.add(controls, "removeCube");
-  gui.add(controls, "numberOfObjects").listen();
   renderScene();
   function renderScene() {
     // 开始统计
     staRef.value?.begin();
+    cube.rotation.x += 0.02;
+    cube.rotation.y += 0.02;
+    cube.rotation.z += 0.02;
 
-    scene.traverse((e) => {
-      if (e instanceof Mesh && e != plane) {
-        e.rotation.x += controls.rotationSpeed;
-        e.rotation.y += controls.rotationSpeed;
-        e.rotation.z += controls.rotationSpeed;
-      }
-    });
-
-    cube.rotation.x += controls.rotationSpeed;
-    cube.rotation.y += controls.rotationSpeed;
-    cube.rotation.z += controls.rotationSpeed;
-
-    step += controls.bouncingSpeed;
+    step += 0.04;
 
     sphere.position.x = 20 + 10 * Math.cos(step);
     sphere.position.y = 2 + 10 * Math.abs(Math.sin(step));
@@ -163,19 +121,9 @@ function initScene() {
     renderer.render(scene, camera);
   }
 }
-
-const onResize = () => {};
 onMounted(() => {
-  // clear();
   initScene();
-  // window.addEventListener("resize", onResize, false);
 });
-function clear() {
-  const dg = document.querySelector(".dg");
-  if (dg) {
-    dg.innerHTML = "";
-  }
-}
 </script>
 
 <template>
